@@ -30,7 +30,12 @@ gps_log_file = fopen(kkk_gps_log,'a');%'A.txt'ÎªÎÄ¼þÃû£»'a'Îª´ò¿ª·½Ê½£ºÔÚ´ò¿ªµÄÎ
 gps_coor_file = fopen(kkk_gps_coor,'a');
 i_row = 0;
 figure; 
-while i_row < 200
+
+%% ²åÈëÒ»ÕÅµØÍ¼µ×Í¼
+
+
+
+while i_row < 15000
     i_row = i_row+1;
     str = fscanf(s);
     %% 2. »ñÈ¡gps ½ÓÊÕÆ÷Êý¾Ý
@@ -48,7 +53,7 @@ while i_row < 200
         fprintf('%s\n',S{6});      % ¾­¶ÈµÄ±êÊ¶ E/W
         fprintf(gps_log_file,'%s',str);%fpÎªÎÄ¼þ¾ä±ú£¬Ö¸¶¨ÒªÐ´ÈëÊý¾ÝµÄÎÄ¼þ¡£×¢Òâ£º%dºóÓÐ¿Õ¸ñ¡£
         
-        %% 3. ½âÎöGPS½ÓÊÕÆ÷Êý¾Ý
+       %% 3. ½âÎöGPS½ÓÊÕÆ÷Êý¾Ý
         % ¸ù¾ÝGPS×´Ì¬S{6}£¬´¦ÀíÊÇ·ñ¼ÆËãÆä×ø±ê
         % GPS×´Ì¬£º0=²»¿ÉÓÃ(FIX NOT valid)£¬1=µ¥µã¶¨Î»(GPS FIX)£¬2=²î·Ö¶¨Î»(DGPS)£¬
         % 3=ÎÞÐ§PPS£¬4=ÊµÊ±²î·Ö¶¨Î»£¨RTK FIX£©£¬5=RTK FLOAT£¬6=ÕýÔÚ¹ÀËã
@@ -60,17 +65,19 @@ while i_row < 200
             %¸ù¾Ý¾­Î³¶È¼ÆËãÎ»ÖÃ£¬²¢ÇÒÏÔÊ¾³öÀ´
             [Lat_d,Lon_d] = ll_dm2d (S{3},S{4},S{5},S{6});
             [x,y,utmzone] = deg2utm(Lat_d,Lon_d);
-            axis([250000 270000 3300000 3400000]); 
+            axis equal;
+            % axis([3360000 3392000 240000 253000 ]); 
             plot(x,y,'*');
             grid on
             hold on;
-            pause(0.18)            
+            pause(0.10)            
             % scatter(x,y)
             % plot(x,y,'MarkerEdgeColor',[0 .5 .5],'MarkerFaceColor',[0 .7 .7],'LineWidth',1.5);
             
-            fprintf(gps_coor_file,'%d\t%d\n',x,y);
+            time_hhmmss_str = S{2};
+            % Êä³ögpsµÄÊ±¼ä£¨hhmmss£©¡¢¾ø¶ÔÊ±¼ä£¨£©¡¢Î»ÖÃ¡¢
+            fprintf(gps_coor_file,'%s\t%d\t%d\n',time_hhmmss_str,x,y);
         end      
-        
     end
 end
 fclose(gps_log_file);%¹Ø±ÕÎÄ¼þ¡£
@@ -78,3 +85,8 @@ fclose(gps_log_file);%¹Ø±ÕÎÄ¼þ¡£
 fclose(s);
 delete(s);
 clear s;
+
+%% ²âÊÔ·½·¨£º
+% 1. ¼ÇÂ¼½ø³öËíµÀµÄÈ·ÇÐÊ±¼ä£¨hhmmss£©
+% 2. Í³¼Æ×ø±ê£¬ÒÔ¼°¶ÔÓ¦Ê±¼ä, ÒÑÔÚ³ÌÐòÖÐÊµÏÖ
+% 3. ÌùÒ»ÕÅµØÍ¼µØÍ¼
